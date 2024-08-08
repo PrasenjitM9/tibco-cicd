@@ -119,7 +119,7 @@ pipeline {
                 
         stage('K8s Deplyoment')
         {
-            agent { label 'mac' }
+/*            agent { label 'mac' }
             steps
             {
                 echo '####################### Create Deployment for App -- ' +"${IMAGE}:${VERSION}"+'  -- in K8S Cluster... #########################'  
@@ -134,7 +134,7 @@ pipeline {
                 //create k8s deployment for app
                 //sh 'kubectl apply -f src/manifest.yaml'
              }
-        }
+        } */
 
     }
 }
