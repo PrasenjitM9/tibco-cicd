@@ -3,22 +3,18 @@ pipeline {
     environment { 
             IMAGE = "bwce_cicd.jenkins-build"
             VERSION = "${BUILD_NUMBER}"
-            DOCKERHUB_CREDENTIALS=credentials('docker-hub-personal')
+            DOCKERHUB_CREDENTIALS=credentials('docker-hub')
             PROJECT_NAME = ""
         }
 
     stages {
-        stage(' Git ') 
-        {
+        stage(' Git ') {
             parallel {
                 stage('on Mac') {
-                    agent {
-                        label "mac"
-                    }
                     steps {
                             echo '########################### Cloning code from  GitHub... ###########################'
                             // Get some code from a GitHub repository
-                            git branch: 'main', url: 'https://github.com/mpandav/cicd-demo.git'
+                            git branch: 'main', url: 'https://github.com/PrasenjitM9/tibco-cicd.git'
                     }
                 }
             }
@@ -26,37 +22,30 @@ pipeline {
              
         stage('Unit Test ')
         {
-            agent {label 'mac'}        
-           steps
-           {
-           // Run Maven on a Unix agent.
-            echo '########################### Perform Unit Tests... ###########################'
-    
-            dir('src/cicd-demo.module.application.parent') 
-            {
-                sh "ls -lrt"
-                // some block
-                sh "mvn clean"
-            }
-            }
-        }
-
-    stage(' App Build ')
-        {
-            agent {label 'mac'}        
-           steps
-           {
-           // Run Maven on a Unix agent.
-            echo '###########################Building Application EAR.. ###########################'
-            sh "mvn -f src/cicd-demo.module.application.parent package"
-            }
-        }
-               
-        stage('Artifactory')
-        {
-            agent {label 'mac'}        
             steps
             {
+            // Run Maven on a Unix agent.
+                    echo '########################### Perform Unit Tests... ###########################'
+        
+                    dir('src/cicd-demo.module.application.parent') 
+                    {
+                        sh "ls -lrt"
+                        // some block
+                        sh "mvn clean"
+                    }
+                }
+        }
+
+        stage(' App Build ') {
+            steps {
+                    // Run Maven on a Unix agent.
+                    echo '###########################Building Application EAR.. ###########################'
+                    sh "mvn -f src/cicd-demo.module.application.parent package"
+                }
+        }
+               
+        stage('Artifactory') {
+            steps {
                 echo '########################### Move deployables to Artifacotory Server.. ###########################'  
                 dir('src/cicd-demo.module.application.parent') 
                 {
@@ -66,11 +55,8 @@ pipeline {
             }
         }
                
-        stage('App Image Processing')
-        {
-            agent {label 'mac'}        
-            steps
-            {
+        stage('App Image Processing') {
+            steps {
              dir('src/') 
             {
                 sh "pwd"
@@ -117,7 +103,7 @@ pipeline {
         }
                 
                 
-/*         stage('K8s Deplyoment')
+/*        stage('K8s Deplyoment')
         {
            agent { label 'mac' }
             steps
